@@ -1,69 +1,118 @@
 # Claim Hunter Backend
 
-A FastAPI backend for text analysis with user authentication and history tracking.
+A robust FastAPI backend for the Claim Hunter application, providing text analysis capabilities, user authentication, and history tracking. This service uses advanced NLP to identify and analyze claims within text.
 
-## Features
-- **Authentication**: Register, Login, JWT Tokens (OAuth2).
-- **Analysis**: Submit text for analysis and receive structured JSON results.
-- **History**: View past analyses.
-- **Database**: PostgreSQL with Alembic migrations.
+## 🚀 Features
 
-## Setup
+- **User Authentication**: Secure registration and login using JWT (JSON Web Tokens) and HttpOnly cookies.
+- **Claim Analysis**: Submit text to be analyzed for potential claims using Google's Generative AI.
+- **History Tracking**: Store and retrieve past analyses for authenticated users.
+- **Database Management**: PostgreSQL integration with Alembic for schema migrations.
+- **CORS Support**: Configurable Cross-Origin Resource Sharing for frontend integration.
+- **Environment Configuration**: Fully configurable via `.env` files.
+
+## 🛠️ Tech Stack
+
+- **Framework**: [FastAPI](https://fastapi.tiangolo.com/) (Python 3.12+)
+- **Database**: [PostgreSQL](https://www.postgresql.org/)
+- **ORM**: [SQLAlchemy](https://www.sqlalchemy.org/)
+- **Migrations**: [Alembic](https://alembic.sqlalchemy.org/)
+- **Authentication**: `python-jose` (JWT), `passlib` (Bcrypt hashing)
+- **AI Integration**: [Google Generative AI](https://ai.google.dev/)
+- **Validation**: [Pydantic](https://docs.pydantic.dev/)
+
+## ⚙️ Setup & Installation
 
 ### Prerequisites
-- Python 3.12+
-- PostgreSQL
-- Virtual Environment (recommended)
 
-### Installation
-1.  **Clone the repository** (if not already done).
-2.  **Create and activate virtual environment**:
+- Python 3.12 or higher
+- PostgreSQL installed and running
+- A Google Cloud API Key for Generative AI
+
+### Installation Steps
+
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/rohitkumar91131/claim-hunter-backend-python.git
+    cd claim-hunter-backend-python
+    ```
+
+2.  **Create and activate a virtual environment**:
     ```bash
     python3 -m venv venv
-    source venv/bin/activate
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
     ```
+
 3.  **Install dependencies**:
     ```bash
     pip install -r requirements.txt
     ```
-    *(Note: If `requirements.txt` is missing, use the command below)*
-    ```bash
-    pip install fastapi uvicorn sqlalchemy alembic pydantic-settings python-jose[cryptography] passlib[bcrypt] python-dotenv psycopg2-binary
-    ```
-4.  **Configure Environment**:
-    - Ensure `.env` exists with correct `DATABASE_URL`.
-    #### Example .env
+
+4.  **Configuration**:
+    Create a `.env` file in the root directory with the following variables:
     ```ini
-    DATABASE_URL=postgresql://claimuser:123456@localhost:5432/claimhunter
-    SECRET_KEY=supersecretkey
+    # Database Configuration
+    DATABASE_URL=postgresql://<username>:<password>@localhost:5432/<dbname>
+
+    # Security
+    SECRET_KEY=your_super_secret_key_here
     ALGORITHM=HS256
     ACCESS_TOKEN_EXPIRE_MINUTES=30
+    
+    # CORS (List of allowed origins)
+    BACKEND_CORS_ORIGINS=["http://localhost:3000", "http://localhost:5173"]
+
+    # AI Service
+    GOOGLE_API_KEY=your_google_api_key
+
+    # App Settings
+    ANALYSIS_TIMEOUT=30
+    ENABLE_RATE_LIMIT=True
     ```
 
-### Database Migration
-Run the following to apply database changes:
-```bash
-alembic upgrade head
-```
+5.  **Run Database Migrations**:
+    Initialize the database schema:
+    ```bash
+    alembic upgrade head
+    ```
 
-### Running the Server
-Start the development server:
-```bash
-uvicorn app.main:app --reload
-```
-The API will be available at `http://localhost:8000`.
-Explore the documentation at `http://localhost:8000/docs`.
+6.  **Start the Server**:
+    ```bash
+    uvicorn app.main:app --reload
+    ```
+    The API will be accessible at `http://localhost:8000`.
 
-## API Usage
+## 📚 API Documentation
 
-### Auth
-- **POST /auth/register**: Create a new account.
-- **POST /auth/login**: Login to get a Bearer token.
-- **GET /auth/me**: Get current user details.
+Once the server is running, you can access the interactive API docs at:
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
 
-### Analysis
-- **POST /analyze**: Submit text for analysis.
-    - Headers: `Authorization: Bearer <token>`
-    - Body: `{"text": "Sample text to analyze"}`
-- **GET /history**: Get list of past analyses.
-- **GET /history/{id}**: Get details of a specific analysis.
+### Key Endpoints
+
+#### Authentication (`/auth`)
+- `POST /auth/register`: Register a new user.
+- `POST /auth/login`: Authenticate and receive an HttpOnly cookie.
+- `POST /auth/logout`: Log out (clears cookie).
+- `GET /auth/me`: Get current authenticated user details.
+
+#### Analysis (`/analyze`)
+- `POST /analyze/text`: Submit a text block for claim analysis.
+  - **Body**: `{"text": "Text to analyze..."}`
+  - **Auth**: Required
+
+#### History (`/history`)
+- `GET /history`: List all past analyses for the current user.
+- `GET /history/{id}`: Get detailed results for a specific analysis.
+
+## 🤝 Contributing
+
+1.  Fork the repository.
+2.  Create a feature branch (`git checkout -b feature/amazing-feature`).
+3.  Commit your changes (`git commit -m 'Add some amazing feature'`).
+4.  Push to the branch (`git push origin feature/amazing-feature`).
+5.  Open a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License.
