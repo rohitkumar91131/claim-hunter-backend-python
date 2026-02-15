@@ -170,6 +170,24 @@ class GeminiClient:
                 logger.error(f"Gemini API HTTP error: {e.response.status_code} - {e.response.text}")
                 raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="AI Verification Service Unavailable")
                 
+            except (httpx.TimeoutException, httpx.ReadTimeout, httpx.ConnectTimeout) as e:
+                logger.warning(f"Gemini API Timeout (Attempt {attempt+1}/{max_retries+1}): {str(e)}")
+                if attempt < max_retries:
+                    wait_time = base_delay * (2 ** attempt)
+                    logger.info(f"Retrying in {wait_time}s...")
+                    import asyncio
+                    await asyncio.sleep(wait_time)
+                    continue
+                logger.error(f"Gemini API Timeout after retries: {str(e)}")
+                raise HTTPException(status_code=status.HTTP_504_GATEWAY_TIMEOUT, detail="AI Analysis Timed Out. Please try again.")
+
             except httpx.RequestError as e:
-                logger.error(f"Gemini API connection error: {repr(e)}")
+                logger.warning(f"Gemini API Connection Error (Attempt {attempt+1}/{max_retries+1}): {str(e)}")
+                if attempt < max_retries:
+                    wait_time = base_delay * (2 ** attempt)
+                    logger.info(f"Retrying in {wait_time}s...")
+                    import asyncio
+                    await asyncio.sleep(wait_time)
+                    continue
+                logger.error(f"Gemini API Connection Error after retries: {repr(e)}")
                 raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=f"AI Verification Service Connectivity Error: {str(e)}")

@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     # Analysis & AI
     GOOGLE_API_KEY: str = ""
-    ANALYSIS_TIMEOUT: int = 10
+    ANALYSIS_TIMEOUT: int = 60
     ENABLE_RATE_LIMIT: bool = True
 
     model_config = ConfigDict(env_file=".env")
