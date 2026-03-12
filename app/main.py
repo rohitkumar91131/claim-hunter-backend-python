@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import auth, analyze, history
+from app.routes import dashboard
 from app.config import settings
 
 app = FastAPI(title="Claim Hunter Backend")
@@ -21,6 +22,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(analyze.router, prefix="/analyze", tags=["Analysis"])
 app.include_router(history.router, prefix="/history", tags=["History"])
+app.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard"])
 
 @app.get("/")
 def read_root():
